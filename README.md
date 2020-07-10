@@ -1,0 +1,1 @@
+An alpha-stage experiment on generating iambic pentameter lines. For more information, see the [relevant page on my Blog](https://blog.homeforfiction.com/2018/06/13/javascript-iambic-pentameter-generator/)
