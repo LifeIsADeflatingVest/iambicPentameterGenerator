@@ -81,50 +81,50 @@ body {
 				adj1Array.push(obj[i].word);
             }
 			adj1 = pickAdjectiveFromDM(adj1Array);
-		}
-		getVerb1Arr().then(function(obj) {
-			if ((obj != null)) {
-				for (var i = 0; i < obj.length; i++) {
-					verb1Array.push(obj[i].word);
-				}
-				verb1 = pickAdjectiveFromDM(verb1Array);
-			}
-			getAdj2Arr().then(function(obj) {
+			getVerb1Arr().then(function(obj) {
 				if ((obj != null)) {
 					for (var i = 0; i < obj.length; i++) {
-						adj2Array.push(obj[i].word);
+						verb1Array.push(obj[i].word);
 					}
-					adj2 = pickAdjectiveFromDM(adj2Array);
-				}
-					getTransitive().then(function(obj){
-						if ((obj != null)) {
-							for (var i = 0; i < obj.length; i++) {
-								testingTransitiveArray.push(obj[i].word);
-							}
-						
-							testingTransitiveArray.forEach(nounFollows);
-							console.log(transitiveArray_group1.length); // debug; feel free to remove
-							console.log(transitiveArray_group2.length);// debug; feel free to remove
+					verb1 = pickVerbFromDM(verb1Array);
+						getAdj2Arr().then(function(obj) {
+							if ((obj != null)) {
+								for (var i = 0; i < obj.length; i++) {
+									adj2Array.push(obj[i].word);
+								}
+								adj2 = pickAdjectiveFromDM(adj2Array);
+									getTransitive().then(function(obj){
+										if ((obj != null)) {
+											for (var i = 0; i < obj.length; i++) {
+												testingTransitiveArray.push(obj[i].word);
+											}
+										
+											testingTransitiveArray.forEach(nounFollows);
+											console.log(transitiveArray_group1.length); // debug; feel free to remove
+											console.log(transitiveArray_group2.length);// debug; feel free to remove
 
-							if  (transitiveArray_group2.length / transitiveArray_group1.length > 3.5) {
-								//this means the verb is likely intransitive. This influences are line 1 & 2 construction.
-								line1 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + adj1 + " " + noun1 + " " + verb1 + ",";
-								line2 = wordChoice(jj, rn5) + " " + wordChoice(nns,rn4) + " " + wordChoice(vb,rn6) + " " + wordChoice(nns,rn7) + ".";
-								console.log("intransitive");
+											if  (transitiveArray_group2.length / transitiveArray_group1.length > 3.5) {
+												//this means the verb is likely intransitive. This influences are line 1 & 2 construction.
+												line1 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + adj1 + " " + noun1 + " " + verb1 + ",";
+												line2 = wordChoice(jj, rn5) + " " + wordChoice(nns,rn4) + " " + wordChoice(vb,rn6) + " " + wordChoice(nns,rn7) + ".";
+												console.log("intransitive");
+											}
+											else {
+												line1 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + adj1 + " " + noun1 + " " + verb1;
+												line2 = adj2 + " " + noun2 + " " + wordChoice(rb, 2) + " " + wordChoice(vbn,2) + ".";
+												console.log("transitive");
+											}
+											
+											line3 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + wordChoice(jj,rn1) + " " + wordChoice(nns,rn2) + " " + wordChoice(vb,rn3);
+											line4 = wordChoice(jj, rn5) + " " + wordChoice(nns,rn4) + " " + wordChoice(vb,rn6) + " " + wordChoice(nns,rn7)+ ".";
+												$('#out1').append(line1+"<br/>"+line2+"<br/>"+line3+"<br/>"+line4+"<br/>"+"<br/>");
+										}
+									});
 							}
-							else {
-								line1 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + adj1 + " " + noun1 + " " + verb1;
-								line2 = adj2 + " " + noun2 + " " + wordChoice(rb, 2) + " " + wordChoice(vbn,2) + ".";
-								console.log("transitive");
-							}
-							
-							line3 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + wordChoice(jj,rn1) + " " + wordChoice(nns,rn2) + " " + wordChoice(vb,rn3);
-							line4 = wordChoice(jj, rn5) + " " + wordChoice(nns,rn4) + " " + wordChoice(vb,rn6) + " " + wordChoice(nns,rn7)+ ".";
-								$('#out1').append(line1+"<br/>"+line2+"<br/>"+line3+"<br/>"+line4+"<br/>"+"<br/>");
-						}
-					});
+						});
+				}
 			});
-		});
+		}
 	});
 
 
