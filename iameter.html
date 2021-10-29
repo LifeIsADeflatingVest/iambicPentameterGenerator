@@ -1,11 +1,27 @@
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/rita/1.3.11/rita-full.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <style>#out1 {color:white;font-family:Verdana}</style>
-   </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="robots" content="noindex">
+	<meta charset="UTF-8">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display&family=Nunito&family=Patrick+Hand&display=swap"
+		rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+		integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/rita/1.3.11/rita-full.js"></script>
+</head>
+<style>
+body {
+	color:white;
+	background-color:black;
+}
+</style>
+<body>
+
   <input type="button" value="Generate New" onclick="window.location.reload();">
   <br><br>
-  <div id="out1"></div><br>
+  <div id="out1" class="theText"></div><br>
 	<script>
 	//some declarations (parts of speech to pass to RiTa; see RiTa documentation: https://rednoise.org/rita/reference/RiTa/RiTa.randomWord/index.php and https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html)
 	var jj = "jj";
@@ -23,46 +39,95 @@
 	var tempArr1 = [];
 	var tempArr2 = [];
 	var testingTransitiveArray = [];
-	var transitiveArray_group1 = [""];
-	var transitiveArray_group2 = [""];
+	var transitiveArray_group1 = [];
+	var transitiveArray_group2 = [];
+	var adj1Array = [];
+	var verb1Array = [];
+	var adj2Array = [];
 	var line1, line2, line3, line4;
+	var noun1, adj1, verb1, noun2, adj2;
 	
 	// getting number of syllables
 	[rn1, rn2, rn3] = syllable();
 	[rn4, rn5, rn6, rn7] = syllable2();
 	
 	// getting some words with RiTa and DM
-	var noun1 = wordChoice(nn,2);
-	var adj1Array = dataMUSE('https://api.datamuse.com/words?rel_jjb='+noun1);
-	var adj1 = pickAdjectiveFromDM(adj1Array);
-	var verb1Array = dataMUSE('https://api.datamuse.com/words?lc='+noun1);
-	var verb1 = pickVerbFromDM(verb1Array);
-	var noun2 = wordChoice (nns, 2);
-	var adj2Array = dataMUSE('https://api.datamuse.com/words?rel_jjb='+noun2);
-	var adj2 = pickAdjectiveFromDM(adj2Array);
-	
-	// structuring lines
-	// but first, checking if verb1 above is transitive or intransitive
-	testingTransitiveArray = dataMUSE('https://api.datamuse.com/words?lc=' + verb1 + "&max=800");
-	testingTransitiveArray.forEach(nounFollows);
-	
-	console.log(transitiveArray_group1.length); // debug; feel free to remove
-	console.log(transitiveArray_group2.length);// debug; feel free to remove
-	if  (transitiveArray_group2.length / transitiveArray_group1.length > 3.5) {
-		//this means the verb is likely intransitive. This influences are line 1 & 2 construction.
-		line1 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + adj1 + " " + noun1 + " " + verb1 + ",";
-		line2 = wordChoice(jj, rn5) + " " + wordChoice(nns,rn4) + " " + wordChoice(vb,rn6) + " " + wordChoice(nns,rn7) + ".";
-		console.log("intransitive");
+	noun1 = wordChoice(nn,2);
+	noun2 = wordChoice (nns, 2);
+	function getAdj1Arr() {
+		return new Promise(function(resolve, reject) {
+			resolve($.get('https://api.datamuse.com/words?rel_jjb='+noun1));
+        });
 	}
-	else {
-		line1 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + adj1 + " " + noun1 + " " + verb1;
-		line2 = adj2 + " " + noun2 + " " + wordChoice(rb, 2) + " " + wordChoice(vbn,2) + ".";
-		console.log("transitive");
+	function getVerb1Arr() {
+		return new Promise(function(resolve, reject) {
+			resolve($.get('https://api.datamuse.com/words?lc='+noun1));
+        });
+	}
+	function getAdj2Arr() {
+		return new Promise(function(resolve, reject) {
+			resolve($.get('https://api.datamuse.com/words?rel_jjb='+noun2));
+        });
+	}
+	function getTransitive() {
+		return new Promise(function(resolve, reject) {
+			resolve($.get('https://api.datamuse.com/words?lc=' + verb1 + "&max=800"));
+        });
 	}
 	
-	line3 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + wordChoice(jj,rn1) + " " + wordChoice(nns,rn2) + " " + wordChoice(vb,rn3);
-	line4 = wordChoice(jj, rn5) + " " + wordChoice(nns,rn4) + " " + wordChoice(vb,rn6) + " " + wordChoice(nns,rn7)+ ".";
-		$('#out1').append(line1+"<br/>"+line2+"<br/>"+line3+"<br/>"+line4+"<br/>"+"<br/>");
+	getAdj1Arr().then(function(obj) {
+		if ((obj != null)) {
+			for (var i = 0; i < obj.length; i++) {
+				adj1Array.push(obj[i].word);
+            }
+			adj1 = pickAdjectiveFromDM(adj1Array);
+		}
+		getVerb1Arr().then(function(obj) {
+			if ((obj != null)) {
+				for (var i = 0; i < obj.length; i++) {
+					verb1Array.push(obj[i].word);
+				}
+				verb1 = pickAdjectiveFromDM(verb1Array);
+			}
+			getAdj2Arr().then(function(obj) {
+				if ((obj != null)) {
+					for (var i = 0; i < obj.length; i++) {
+						adj2Array.push(obj[i].word);
+					}
+					adj2 = pickAdjectiveFromDM(adj2Array);
+				}
+					getTransitive().then(function(obj){
+						if ((obj != null)) {
+							for (var i = 0; i < obj.length; i++) {
+								testingTransitiveArray.push(obj[i].word);
+							}
+						
+							testingTransitiveArray.forEach(nounFollows);
+							console.log(transitiveArray_group1.length); // debug; feel free to remove
+							console.log(transitiveArray_group2.length);// debug; feel free to remove
+
+							if  (transitiveArray_group2.length / transitiveArray_group1.length > 3.5) {
+								//this means the verb is likely intransitive. This influences are line 1 & 2 construction.
+								line1 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + adj1 + " " + noun1 + " " + verb1 + ",";
+								line2 = wordChoice(jj, rn5) + " " + wordChoice(nns,rn4) + " " + wordChoice(vb,rn6) + " " + wordChoice(nns,rn7) + ".";
+								console.log("intransitive");
+							}
+							else {
+								line1 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + adj1 + " " + noun1 + " " + verb1;
+								line2 = adj2 + " " + noun2 + " " + wordChoice(rb, 2) + " " + wordChoice(vbn,2) + ".";
+								console.log("transitive");
+							}
+							
+							line3 = capitalizeFirstLetter(RiTa.randomWord(pspr,1)) + " " + RiTa.randomWord(jj,1) + " " + wordChoice(jj,rn1) + " " + wordChoice(nns,rn2) + " " + wordChoice(vb,rn3);
+							line4 = wordChoice(jj, rn5) + " " + wordChoice(nns,rn4) + " " + wordChoice(vb,rn6) + " " + wordChoice(nns,rn7)+ ".";
+								$('#out1').append(line1+"<br/>"+line2+"<br/>"+line3+"<br/>"+line4+"<br/>"+"<br/>");
+						}
+					});
+			});
+		});
+	});
+
+
 	//pick suitable adjective from DM
 	function pickAdjectiveFromDM(array) {
 		var word = wordChoice(jj,4); //fallback in case DM returns null;
@@ -92,6 +157,7 @@
 		}
 		return word;
 	}	
+
 	// word picking function
 	function wordChoice(pos, syl) {
 		var word = RiTa.randomWord(pos, syl);
@@ -102,6 +168,7 @@
 			return (wordChoice(pos, syl));
 		}
 	}	
+
 	//random number. Use with getRndInteger(1,3) - for 1, 2, or 3
 	function getRndInteger(min, max) {
 		return Math.floor(Math.random() * (max - min + 1) ) + min;
@@ -177,31 +244,6 @@
 	  return string.charAt(0).toUpperCase() + string.slice(1);
 	}
 	
-	function dataMUSE (myURL) {
-		var json = (function () {
-			var json = null;
-			$.ajax({
-				'async': false,
-				'global': false,
-				'url': myURL,
-				'dataType': "json",
-				'success': function (data) {
-					json = data;
-				}
-			});
-			return json;
-		})();		
-		var amb = JSON.stringify(json);
-		amb = amb.replace(/[.,\/#!?'"$%\^&\*;:{}\[\]=\-_`~()]/g,"");
-		amb = amb.replace(/word/g , " ");
-		amb = amb.replace(/score/g, " ");
-		amb = amb.replace(/[0-9]/g, " "); 
-		amb = amb.replace(/numSyllables/g, " "); 
-		amb = amb.replace(/\s+/g,' ').trim();
-		amb = amb.split(" ");
-		return amb;
-	}
-	
 	function nounFollows (item, index) {
 		if (RiTa.isNoun(item)) {
 			transitiveArray_group1.push(item);
@@ -211,4 +253,5 @@
 		}
 	}
 	</script>
+</body>
 </html>
